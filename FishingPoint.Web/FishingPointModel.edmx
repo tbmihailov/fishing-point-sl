@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="FishingPoint.Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="FishingPointModelStoreContainer">
+          <EntitySet Name="FishermanUser" EntityType="FishingPoint.Model.Store.FishermanUser" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Points" EntityType="FishingPoint.Model.Store.Points" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_Points_FishermanUser" Association="FishingPoint.Model.Store.FK_Points_FishermanUser">
+            <End Role="FishermanUser" EntitySet="FishermanUser" />
+            <End Role="Points" EntitySet="Points" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="FishermanUser">
+          <Key>
+            <PropertyRef Name="FishermanUserId" />
+          </Key>
+          <Property Name="FishermanUserId" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Username" Type="nvarchar" MaxLength="50" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
+          <Property Name="Registered" Type="datetime" />
+          <Property Name="Country" Type="nvarchar" MaxLength="50" />
+          <Property Name="City" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Points">
+          <Key>
+            <PropertyRef Name="PointId" />
+          </Key>
+          <Property Name="PointId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="Latitude" Type="float" />
+          <Property Name="Longitude" Type="float" />
+          <Property Name="Tags" Type="nvarchar" MaxLength="255" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
+          <Property Name="Created" Type="datetime" />
+          <Property Name="IsPublic" Type="bit" />
+          <Property Name="Rating" Type="numeric" />
+        </EntityType>
+        <Association Name="FK_Points_FishermanUser">
+          <End Role="FishermanUser" Type="FishingPoint.Model.Store.FishermanUser" Multiplicity="0..1" />
+          <End Role="Points" Type="FishingPoint.Model.Store.Points" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FishermanUser">
+              <PropertyRef Name="FishermanUserId" />
+            </Principal>
+            <Dependent Role="Points">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="FishingPoint.Model" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="FishingPointEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="FishermanUsers" EntityType="FishingPoint.Model.FishermanUser" />
+          <EntitySet Name="Points" EntityType="FishingPoint.Model.Point" />
+          <AssociationSet Name="FK_Points_FishermanUser" Association="FishingPoint.Model.FK_Points_FishermanUser">
+            <End Role="FishermanUser" EntitySet="FishermanUsers" />
+            <End Role="Point" EntitySet="Points" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="FishermanUser">
+          <Key>
+            <PropertyRef Name="FishermanUserId" />
+          </Key>
+          <Property Name="FishermanUserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Username" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Name" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Description" Type="String" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="Registered" Type="DateTime" />
+          <Property Type="String" Name="Country" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="City" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Points" Relationship="FishingPoint.Model.FK_Points_FishermanUser" FromRole="FishermanUser" ToRole="Point" />
+        </EntityType>
+        <EntityType Name="Point">
+          <Key>
+            <PropertyRef Name="PointId" />
+          </Key>
+          <Property Name="PointId" Type="Int32" Nullable="false" />
+          <Property Name="Latitude" Type="Double" />
+          <Property Name="Longitude" Type="Double" />
+          <Property Name="Tags" Type="String" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="Description" Type="String" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="Created" Type="DateTime" />
+          <Property Type="Boolean" Name="IsPublic" />
+          <Property Type="Decimal" Name="Rating" Precision="18" Scale="0" />
+          <Property Type="Int32" Name="UserId" />
+          <NavigationProperty Name="User" Relationship="FishingPoint.Model.FK_Points_FishermanUser" FromRole="Point" ToRole="FishermanUser" />
+        </EntityType>
+        <Association Name="FK_Points_FishermanUser">
+          <End Type="FishingPoint.Model.FishermanUser" Role="FishermanUser" Multiplicity="0..1" />
+          <End Type="FishingPoint.Model.Point" Role="Point" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FishermanUser">
+              <PropertyRef Name="FishermanUserId" />
+            </Principal>
+            <Dependent Role="Point">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="FishingPointModelStoreContainer" CdmEntityContainer="FishingPointEntities">
+          <EntitySetMapping Name="FishermanUsers"><EntityTypeMapping TypeName="FishingPoint.Model.FishermanUser"><MappingFragment StoreEntitySet="FishermanUser">
+            <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="Country" ColumnName="Country" />
+                <ScalarProperty Name="FishermanUserId" ColumnName="FishermanUserId" />
+            <ScalarProperty Name="Username" ColumnName="Username" />
+            <ScalarProperty Name="Name" ColumnName="Name" />
+            <ScalarProperty Name="Description" ColumnName="Description" />
+            <ScalarProperty Name="Registered" ColumnName="Registered" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="Points"><EntityTypeMapping TypeName="FishingPoint.Model.Point"><MappingFragment StoreEntitySet="Points">
+            <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Rating" ColumnName="Rating" />
+                <ScalarProperty Name="IsPublic" ColumnName="IsPublic" />
+                <ScalarProperty Name="PointId" ColumnName="PointId" />
+            <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+            <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+            <ScalarProperty Name="Tags" ColumnName="Tags" />
+            <ScalarProperty Name="Description" ColumnName="Description" />
+            <ScalarProperty Name="Created" ColumnName="Created" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="FishingPointModel">
+        <EntityTypeShape EntityType="FishingPoint.Model.FishermanUser" Width="1.5" PointX="0.75" PointY="1.125" Height="2.1725878906249996" IsExpanded="true" />
+        <EntityTypeShape EntityType="FishingPoint.Model.Point" Width="1.5" PointX="3.875" PointY="1.125" Height="2.9417936197916665" IsExpanded="true" />
+        <AssociationConnector Association="FishingPoint.Model.FK_Points_FishermanUser" >
+          <ConnectorPoint PointX="2.25" PointY="2.4035953776041667" />
+          <ConnectorPoint PointX="3.875" PointY="2.4035953776041667" />
+        </AssociationConnector>
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

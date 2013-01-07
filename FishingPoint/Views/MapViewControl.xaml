@@ -1,0 +1,108 @@
+﻿<UserControl xmlns:inputToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Input.Toolkit"  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:m="clr-namespace:Microsoft.Maps.MapControl;assembly=Microsoft.Maps.MapControl" xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" xmlns:FishingPoint_Controls="clr-namespace:FishingPoint.Controls" 
+    x:Class="FishingPoint.Views.MapViewControl"
+    d:DesignHeight="576" d:DesignWidth="816"
+    mc:Ignorable="d"
+    DataContext="{Binding Source={StaticResource Locator}, Path=MapViewModel}"
+    >
+    <UserControl.Resources>
+
+    </UserControl.Resources>
+
+    <Grid x:Name="LayoutRoot" Background="White">
+    	<Grid.ColumnDefinitions>
+    		<ColumnDefinition Width="Auto" MinWidth="140"/>
+    		<ColumnDefinition Width="Auto"/>
+    		<ColumnDefinition/>
+    		<ColumnDefinition Width="Auto" MinWidth="54"/>
+    	</Grid.ColumnDefinitions>
+    	<Grid x:Name="PointsListGrid" Style="{StaticResource BlueAtTheBottomGridStyle}">
+    		<Grid Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" >
+    			<Grid.ColumnDefinitions>
+    				<ColumnDefinition Width="*"/>
+    			</Grid.ColumnDefinitions>
+    			<Grid.RowDefinitions>
+    				<RowDefinition Height="Auto"/>
+    				<RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+    			</Grid.RowDefinitions>
+    			<StackPanel Grid.Column = "0"
+    				Grid.Row="0">
+    				<TextBlock><Run Text="Fishing points:"/></TextBlock>
+    			</StackPanel>
+                <ListBox Grid.Row="1"
+                    ItemsSource="{Binding Path=View}" VerticalAlignment="Stretch" Background="{x:Null}" Margin="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="Name" Margin="2"/>
+                                <TextBlock Text="{Binding Name}" Margin="2"/>
+                                <TextBlock Text="Description" Margin="2"/>
+                                <TextBlock Text="{Binding Description}" Margin="2"/>
+                                <inputToolkit:Rating Value="{Binding Rating}" Margin="2"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Grid.Row="2">
+                    
+                </StackPanel>
+            </Grid>
+    	</Grid>
+    	<m:Map 
+    		CredentialsProvider="ArYB6jQ1y4e_aM-XeJo8eQQTwGpx9VvSCRAZwUYF2PdjagX2OYpUW8PKr5c5QjEm"
+    		Center="42.675873, 25.361252" 
+    		ZoomLevel="7.3" 
+    		ScaleVisibility="Visible" 
+    		NavigationVisibility="Visible"
+    		Mode="Aerial" 
+    		x:Name="AgentsMap" Margin="0" Grid.Column="2" Grid.ColumnSpan="2" MouseClick="AgentsMap_MouseClick">
+    		<m:Map.Resources>
+    			<DataTemplate x:Key="PushPinDataTemplate">
+    				<FishingPoint_Controls:Fisherman
+					 	Width="12"  Height="20" m:MapLayer.Position="{Binding Location}" m:MapLayer.PositionOrigin="BottomCenter" 
+    				/>
+    			</DataTemplate>
+    		</m:Map.Resources>
+            <m:MapItemsControl x:Name="LayerFisherPoints" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0" ItemsSource="{Binding View}"
+                               ItemTemplate="{StaticResource PushPinDataTemplate}">
+                
+            </m:MapItemsControl>
+            <m:MapItemsControl x:Name="LayerFisherPoints1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0" ItemsSource="{Binding View}">
+				<FishingPoint_Controls:Fisherman Width="24"  Height="40" m:MapLayer.Position="42.657117,23.356022" m:MapLayer.PositionOrigin="BottomCenter" />
+    			<FishingPoint_Controls:Fisherman Width="24"  Height="40" m:MapLayer.Position="42.693581, 23.334808" m:MapLayer.PositionOrigin="BottomCenter" />
+    		</m:MapItemsControl>
+    	</m:Map>
+    	<StackPanel x:Name="MapButtonsStackPanel" Grid.Column="3" Height="Auto" VerticalAlignment="Top" Style="{StaticResource MapButtonsStackPanelStyle}" >
+    		<StackPanel.Background>
+    			<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+    				<GradientStop Color="#8018D2FD" Offset="1"/>
+    				<GradientStop Color="#4CFFFFFF" Offset="0.832"/>
+    			</LinearGradientBrush>
+    		</StackPanel.Background>
+			<Button x:Name="AddButton" Width="50" Height="50" Style="{StaticResource MapButtonButtonStyle}" Background="#4CF0F8FF" Margin="2,2,2,1">
+				<StackPanel>
+					<Grid>
+						<Image Source="/FishingPoint;component/Assets/Images/fisherman-icon.png" Height="30" />
+						<Image Margin="0,0,3,0" Source="/FishingPoint;component/Assets/Images/add-1-icon-small.png" Stretch="Fill" HorizontalAlignment="Right" Width="14" Height="14" VerticalAlignment="Bottom" d:LayoutOverrides="HorizontalAlignment"/>
+					</Grid>
+					<TextBlock Text="Add point" Style="{StaticResource MapButtonTextBlockStyle}"/>
+				</StackPanel>
+			</Button>
+			<Button x:Name="CancelButton" Width="50" Height="50" Style="{StaticResource MapButtonButtonStyle}" Background="#4CF0F8FF" Margin="2,2,2,1"
+                    Visibility="{Binding IsPushingMode, Converter={StaticResource BoolToVisibility}}">
+				<StackPanel>
+					<Grid>
+						<Image Source="/FishingPoint;component/Assets/Images/cancel-icon-small.png" Height="24" />
+					</Grid>
+					<TextBlock Text="Cancel" Style="{StaticResource MapButtonTextBlockStyle}" VerticalAlignment="Bottom"/>
+				</StackPanel>
+			</Button>
+			<StackPanel Height="5"/>
+    	</StackPanel>
+
+    	<!--<sdk:GridSplitter Grid.Column="1" HorizontalAlignment="Center"  VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Style="{StaticResource MapGridSplitterStyle}"/>-->
+
+    </Grid>
+</UserControl>
+
+

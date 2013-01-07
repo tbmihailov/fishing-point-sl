@@ -1,0 +1,328 @@
+﻿<#@ template language="C#" hostspecific="True" debug="True" #>
+<#@ output extension="cs" #>
+<#@ include file="T4Toolbox.tt" #>
+<#
+// <copyright file="AllDataClassesGenerator.tt.tt" company="Acstre">
+//  Copyright © Todor Mihailov. All Rights Reserved.
+// </copyright>
+string MyClass = "PointGroup"; 
+string myClass = MyClass.ToLower()[0]+MyClass.Substring(1);
+
+string MyClasses = MyClass+"s";
+string myClasses = MyClasses.ToLower()[0]+MyClasses.Substring(1);
+#>
+ 
+/*-------------------------------------------*/
+#region I<#= MyClass #>DataService.cs
+//I<#= MyClass #>DataService.cs
+using System;
+using System.Collections.ObjectModel;
+using System.ServiceModel.DomainServices.Client;
+using FishingPoint.Web;
+
+namespace FishingPoint.Services
+{
+    public interface I<#= MyClass #>DataService
+    {
+        event EventHandler<HasChangesEventArgs> NotifyHasChanges;	
+
+        void Save(Action<SubmitOperation> submitCallback, object state);
+
+        void Get<#= MyClass #>ById(int <#= myClass #>Id, Action<ObservableCollection<<#= MyClass #>>> get<#= MyClass #>Callback);
+
+        void Get<#= MyClasses #>List(
+            Action<ObservableCollection<<#= MyClass #>>> get<#= MyClasses #>Callback,
+            int pageSize);
+
+        void Save(<#= MyClass #> <#= myClass #>, Action<SubmitOperation> submitCallback, object state);
+    }
+}
+#endregion
+
+/*-------------------------------------------*/
+#region  <#= MyClass #>DataService.cs
+using System;
+using System.Collections.ObjectModel;
+using System.ServiceModel.DomainServices.Client;
+using Microsoft.Windows.Data.DomainServices;
+using FishingPoint.Web;
+using FishingPoint.Web.Services;
+
+namespace FishingPoint.Services
+{
+	//ServiceProviderBase
+	//public virtual I<#= MyClass #>DataService <#= MyClass #>DataService { get; protected set; }
+	//
+	//ServiceProvider
+	//    public override I<#= MyClass #>DataService <#= MyClass #>DataService
+    //    {
+    //        get { return new <#= MyClass #>DataService(); }
+    //    }
+	
+    public class <#= MyClass #>DataService : I<#= MyClass #>DataService
+    {
+        public event EventHandler<HasChangesEventArgs> NotifyHasChanges;
+        public FishingPointContext Context { get; set; }
+        private Action<ObservableCollection< <#= MyClass #> >> _get<#= MyClasses #>Callback;
+
+        private LoadOperation<<#= MyClass #>> _<#= myClasses #>LoadOperation;
+        private int _pageIndex;
+
+        /// <summary>
+        /// Initialize the <#= MyClass #>DataContext
+        /// </summary>
+        public <#= MyClass #>DataService()
+        {
+            Context = new FishingPointContext();
+            Context.PropertyChanged += ContextPropertyChanged;
+        }
+
+        /// <summary>
+        /// Saves changes to the Context if available.
+        /// </summary>
+        /// <param name="submitCallback">CallBack to be called after load complition</param>
+        /// <param name="state"></param>
+        public void Save(Action<SubmitOperation> submitCallback, object state)
+        {
+            if (Context.HasChanges)
+            {
+                Context.SubmitChanges(submitCallback, state);
+            }
+        }
+
+        /// <summary>
+        /// Load <#= MyClass #>List
+        /// </summary>
+        /// <param name="get<#= MyClasses #>Callback">CallBack to be called after load complition</param>
+        /// <param name="pageSize"></param>
+        public void Get<#= MyClasses #>List(Action<ObservableCollection<<#= MyClass #>>> get<#= MyClasses #>Callback, int pageSize)
+        {
+            Clear<#= MyClasses #>();
+            var query = Context.Get<#= MyClasses #>Query().Take(pageSize);
+            Run<#= MyClasses #>Query(query, get<#= MyClasses #>Callback);
+        }
+
+        /// <summary>
+        /// Notifies for property changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ContextPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (NotifyHasChanges != null)
+            {
+                NotifyHasChanges(this, new HasChangesEventArgs() { HasChanges = Context.HasChanges });
+            }
+        }
+
+        /// <summary>
+        /// Clear <#= MyClass #> List
+        /// </summary>
+        private void Clear<#= MyClasses #>()
+        {
+            _pageIndex = 0;
+            Context.<#= MyClasses #>.Clear();
+        }
+
+        /// <summary>
+        /// Run <#= MyClasses #> Query
+        /// </summary>
+        /// <param name="query">Query</param>
+        /// <param name="get<#= MyClasses #>Callback">CallBack</param>
+        private void Run<#= MyClasses #>Query(EntityQuery<<#= MyClass #>> query, Action<ObservableCollection<<#= MyClass #>>> get<#= MyClasses #>Callback)
+        {
+            _get<#= MyClasses #>Callback = get<#= MyClasses #>Callback;
+            _<#= myClasses #>LoadOperation = Context.Load<<#= MyClass #>>(query);
+            _<#= myClasses #>LoadOperation.Completed += OnLoad<#= MyClasses #>Completed;
+        }
+
+        /// <summary>
+        /// <#= MyClasses #> loading Completed event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLoad<#= MyClasses #>Completed(object sender, EventArgs e)
+        {
+            _<#= myClasses #>LoadOperation.Completed -= OnLoad<#= MyClasses #>Completed;
+            var <#= myClasses #> = new EntityList<<#= MyClass #>>(Context.<#= MyClasses #>, _<#= myClasses #>LoadOperation.Entities);
+            _get<#= MyClasses #>Callback(<#= myClasses #>);
+        }
+
+        /// <summary>
+        /// Get <#= MyClass #> by Id
+        /// </summary>
+        /// <param name="<#= myClass #>Id"></param>
+        /// <param name="get<#= MyClasses #>Callback"></param>
+        public void Get<#= MyClass #>ById(int <#= myClass #>Id, Action<ObservableCollection<<#= MyClass #>>> get<#= MyClass #>Callback)
+        {
+            Clear<#= MyClasses #>();
+            var query = Context.Get<#= MyClasses #>Query().Where(mm => mm.<#= MyClass #>Id == <#= myClass #>Id);
+            Run<#= MyClasses #>Query(query, get<#= MyClass #>Callback);
+        }
+
+
+        public void Save(<#= MyClass #> <#= myClass #>, Action<SubmitOperation> submitCallback, object state)
+        {
+            Context.<#= MyClasses #>.Add(<#= myClass #>);
+            if (Context.HasChanges)
+            {
+                Context.SubmitChanges(submitCallback, state);
+            }
+        }
+    }
+}
+#endregion 
+
+/*-------------------------------------------*/
+#region Design<#= MyClasses #>.cs
+using System;
+using System.Collections.ObjectModel;
+using FishingPoint.Web;
+using System.Collections.Generic;
+
+namespace FishingPoint.DesignModel
+{
+    public class Design<#= MyClasses #> : ObservableCollection<<#= MyClass #>>
+    {
+		private const int entitiesCount = 10;
+        public Design<#= MyClasses #>():this(entitiesCount)
+        {
+        }
+		
+		public Design<#= MyClasses #>(int entitiesCount)
+        {
+            var <#= myClasses #>List = GenerateDesign<#= MyClasses #>List(entitiesCount);
+            foreach (var <#= myClass #> in <#= myClasses #>List)
+            {
+                this.Add(<#= myClass #>);
+            }
+        }
+
+        public IList<<#= MyClass #>> GenerateDesign<#= MyClasses #>List(int entitiesCount)
+        {
+            IList<<#= MyClass #>> generatedSource = new List<<#= MyClass #>>();
+
+            for (int i = 2; i < entitiesCount; i++)
+            {
+                var <#= myClass #> =
+                    new <#= MyClass #>()
+                    {
+                        <#= MyClass #>Id = i,
+						Code = String.Format("{0:00000}",i),
+						Name = "<#= MyClass #>"+i,
+						
+                    };
+                generatedSource.Add(<#= myClass #>);
+            }
+
+            return generatedSource;
+        }
+
+    }
+    
+}
+
+
+#endregion 
+
+/*-------------------------------------------*/
+#region Design<#= MyClass #>DataService.cs
+using System;
+using FishingPoint.Web;
+using FishingPoint.DesignModel;
+
+namespace FishingPoint.Services
+{
+    public class Design<#= MyClass #>DataService : I<#= MyClass #>DataService
+    {
+        public event EventHandler<HasChangesEventArgs> NotifyHasChanges;
+
+        public void Save(Action<System.ServiceModel.DomainServices.Client.SubmitOperation> submitCallback, object state)
+        {
+            submitCallback(null);
+        }
+
+        public void Get<#= MyClasses #>List(Action<System.Collections.ObjectModel.ObservableCollection<<#= MyClass #>>> get<#= MyClasses #>Callback, int pageSize)
+        {
+            get<#= MyClasses #>Callback(new Design<#= MyClasses #>());
+        }
+
+        public void Get<#= MyClass #>ById(int <#= myClass #>Id, Action<System.Collections.ObjectModel.ObservableCollection<<#= MyClass #>>> get<#= MyClass #>Callback)
+        {
+            get<#= MyClass #>Callback(new Design<#= MyClasses #>());
+        }
+
+
+        public void Save(<#= MyClass #> <#= myClass #>, Action<System.ServiceModel.DomainServices.Client.SubmitOperation> submitCallback, object state)
+        {
+            submitCallback(null);
+        }
+    }
+}
+
+
+#endregion 
+
+/*-------------------------------------------------------*/
+#region <#= MyClass #>Messages.cs
+//<#= MyClass #>Messages.cs
+using System.Windows;
+using GalaSoft.MvvmLight.Messaging;
+using FishingPoint.Web;
+
+namespace FishingPoint.Messages
+{
+    public class LaunchEdit<#= MyClass #>Message : MessageBase
+    {
+        public LaunchEdit<#= MyClass #>Message()
+            : base()
+        { }
+
+        public LaunchEdit<#= MyClass #>Message(<#= MyClass #> <#= myClass #>)
+        {
+            this.<#= MyClass #> = <#= myClass #>;
+        }
+
+        public <#= MyClass #> <#= MyClass #> { get; set; }
+    }
+
+    public class Updated<#= MyClass #>Message : MessageBase
+    {
+        public Updated<#= MyClass #>Message()
+            : base()
+        { }
+
+        public Updated<#= MyClass #>Message(<#= MyClass #> <#= myClass #>)
+        {
+            this.<#= MyClass #> = <#= myClass #>;
+        }
+
+        public <#= MyClass #> <#= MyClass #> { get; set; }
+    }
+
+    public class Saved<#= MyClass #>DialogMessage : DialogMessage
+    {
+
+        public Saved<#= MyClass #>DialogMessage(string content, string title)
+            : base(content, null)
+        {
+            Button = MessageBoxButton.OK;
+            Caption = title;
+        }
+    }
+
+    public class LaunchNew<#= MyClass #>Message : MessageBase
+    {
+        public LaunchNew<#= MyClass #>Message()
+            : base()
+        { }
+
+        public LaunchNew<#= MyClass #>Message(<#= MyClass #> <#= myClass #>)
+        {
+            this.<#= MyClass #> = <#= myClass #>;
+        }
+
+        public <#= MyClass #> <#= MyClass #> { get; set; }
+    }
+}
+#endregion

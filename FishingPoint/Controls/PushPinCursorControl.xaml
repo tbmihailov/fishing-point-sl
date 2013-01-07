@@ -1,0 +1,16 @@
+﻿<UserControl xmlns:my="clr-namespace:FishingPoint.Controls"  x:Class="FishingPoint.Controls.PushPinCursorControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="131" d:DesignWidth="89" IsHitTestVisible="False">
+    <Canvas Height="144" Width="99">
+        <Path Canvas.Left="7" Canvas.Top="45" Data="M 46.25,12.375L 55,12.375L 55,89.875L 46.25,89.875L 46.25,12.375 Z M 12.25,55.125L 12.25,46.375L 89.75,46.375L 89.75,55.125L 12.25,55.125 Z " Fill="#FFB40000" Height="77.5" Name="Stand" Stretch="Fill" UseLayoutRounding="False" Width="77.5">
+            <Path.Projection>
+                <PlaneProjection RotationX="-58.264" RotationY="-20.277" RotationZ="13.98" />
+            </Path.Projection>
+        </Path>
+        <Image Canvas.Left="13" Canvas.Top="8" Height="77" Name="image1" Source="/FishingPoint;component/Assets/Images/fisherman-icon.png" Stretch="Fill" Width="49" />
+    </Canvas>
+</UserControl>
